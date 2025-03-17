@@ -3,4 +3,4 @@ matplotlib
 numpy
 pandas
 joblib
-sklearn
+scikit-learn==1.6.1
