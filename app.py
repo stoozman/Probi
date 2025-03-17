@@ -68,21 +68,41 @@ if st.button('Предсказать эффект'):
         st.warning("Прогнозируется отсутствие эффекта от введения продукта.")
         st.write(f"Вероятность отсутствия эффекта: {probability[0][0]:.2f}")
     
-    # Визуализация коэффициентов модели
-    st.subheader("Влияние параметров на прогноз:")
-    coefficients = pd.Series(model.coef_[0], index=features)
-    coefficients_sorted = coefficients.sort_values(ascending=False)
+    # Визуализация изменения параметров
+    st.subheader("Прогнозируемое изменение параметров:")
     
-    fig, ax = plt.subplots(figsize=(10, 6))
-    coefficients_sorted.plot(kind='bar', ax=ax)
-    plt.title('Влияние параметров на прогноз (коэффициенты модели)')
-    plt.xlabel('Параметры')
-    plt.ylabel('Коэффициент')
+    # Пример прогнозируемых значений (замените на реальные расчеты)
+    predicted_values = {
+        'ALB': user_input['ALB'] * 0.95,
+        'BUN': user_input['BUN'] * 1.1,
+        'A/G': user_input['A/G'] * 0.98,
+        'GLU': user_input['GLU'] * 0.97,
+        'GLO': user_input['GLO'] * 1.05,
+        'BUN|CRE': user_input['BUN|CRE'] * 1.15,
+        'TBIL': user_input['TBIL'] * 0.9,
+        'Na+': user_input['Na+'] * 0.98,
+        'P': user_input['P'] * 1.03,
+        'AMY': user_input['AMY'] * 0.85
+    }
+    
+    # Таблица с текущими и прогнозируемыми значениями
+    results_df = pd.DataFrame({
+        'Параметр': features,
+        'Текущее значение': [user_input[feature] for feature in features],
+        'Прогнозируемое значение': [predicted_values[feature] for feature in features]
+    })
+    st.dataframe(results_df)
+    
+    # Графики изменения параметров
+    fig, ax = plt.subplots(figsize=(12, 8))
+    x = range(len(features))
+    ax.bar(x, [user_input[feature] for feature in features], width=0.4, label='Текущее значение', align='center')
+    ax.bar(x, [predicted_values[feature] for feature in features], width=0.4, label='Прогнозируемое значение', align='edge')
+    ax.set_xticks(x)
+    ax.set_xticklabels(features)
+    ax.legend()
+    ax.set_title('Изменение биохимических параметров после введения продукта')
     st.pyplot(fig)
-    
-    # Интерпретация коэффициентов
-    st.write("Положительные коэффициенты увеличивают вероятность эффекта продукта, отрицательные - уменьшают.")
-    st.write("Наибольшее влияние оказывают параметры с наибольшей по модулю величиной коэффициента.")
 
 # Добавляем информацию о параметрах
 st.markdown("---")
@@ -105,7 +125,7 @@ st.markdown("""
 # Добавляем информацию о применении
 expander = st.expander("Показать рекомендации по применению продукта")
 expander.markdown("""
-**Рекомендации по применению продукта:**
+**Рекомендации по применению продукта:** 
 
 1. **Дозировка**: согласно инструкции производителя (обычно рассчитывается на кг веса животного)
 2. **Периодичность**: предпочтительно в периоды повышенной метаболической нагрузки
